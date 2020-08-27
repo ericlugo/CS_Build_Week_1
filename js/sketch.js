@@ -1,20 +1,29 @@
 /* ////////////////////////  VARIABLE INSTANTIATION  //////////////////////// */
 let app,
-  appContent,
   canvas,
-  canvasContainer,
+  clearButton,
   columns,
-  generationContainer,
-  generationCount,
+  frameCount,
+  genCount,
+  genWrapper,
   grid,
+  maxSteps,
+  minSteps,
   playButton,
-  rate,
+  randomButton,
   resolution,
-  restartButton,
+  resolutionButton,
+  resolutionDisplay,
+  resolutionInput,
   rows,
-  tempGrid;
+  stepAmount,
+  stepButton,
+  stepInput,
+  tempGrid,
+  tickRate,
+  wrapper;
 
-appContent = `
+let html = `
   <header class="container">
       <div class="width-container">
         <h1>conway's game of life</h1>
@@ -64,48 +73,40 @@ appContent = `
       </div>
     </footer>
   `;
-generationCount = 0;
-rate = 2;
-resolution = 5;
-running = false;
 
-/* ////////////////////////  SETUP & LOOP FUNCTIONS  //////////////////////// */
+/* ////////////  SETUP, DRAW LOOP, & AUXILLARY SKETCH FUNCTIONS  //////////// */
 function setup() {
-  // add elements to DOM and instantiate canvas
-  document.querySelector(`main`).remove();
-  app = createDiv(appContent).class(`flex-fix`);
-  canvasContainer = document.querySelector(`#app-container`);
-  generationContainer = document.querySelector(`#count`);
-  canvas = createCanvas(
-    canvasContainer.clientWidth,
-    canvasContainer.clientHeight,
-  ).parent(canvasContainer);
-  sketchUIContainer = document.querySelector(`#sketchui`);
-  restartButton = createButton(`Restart Sketch`).parent(sketchUIContainer);
-  restartButton.mousePressed(resetSketch);
-  playButton = createButton(`Play Sketch`).parent(sketchUIContainer);
-  playButton.mousePressed(toggleSketch);
-
-  // set grid dimensions, center canvas grid within parent, initialize grid, and start animation
-  resetSketch();
-  toggleSketch();
-
-  // call theme loader to check local storage and update as needed
+  initializeBaseValues();
+  initializeUI();
   loadTheme();
+  clearSketch();
 }
 
 function draw() {
-  generationContainer.innerText = int(generationCount);
+  genWrapper.innerText = int(genCount);
   clear();
   noStroke();
-  frameRate(rate);
+  frameRate(60);
   for (let x = 0; x < columns; x++) {
     for (let y = 0; y < rows; y++) {
       grid[x][y].display();
     }
   }
-  if (running) {
+  if (mouseInCanvas) {
+    fill(200);
+    let [column, row] = getGridCoordinates();
+    square(column * resolution, row * resolution, resolution);
+  }
+  if (running && frameCount === 0) {
     grid = updateGrid();
-    generationCount += 1;
+    genCount += 1;
+  }
+  frameCount = (frameCount + 1) % floor(60 / tickRate);
+}
+
+function mousePressed() {
+  if (!running && mouseInCanvas()) {
+    let [column, row] = getGridCoordinates();
+    grid[column][row].toggleState();
   }
 }

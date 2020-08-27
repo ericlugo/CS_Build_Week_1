@@ -4,6 +4,12 @@ function initializeGrid() {
   return arr;
 }
 
+function initializeRandomGrid() {
+  let arr = instantiateEmptyGrid();
+  fillRandomGrid(arr);
+  return arr;
+}
+
 function instantiateEmptyGrid() {
   let arr = new Array(columns);
   for (let x = 0; x < columns; x++) {
@@ -16,8 +22,15 @@ function fillEmptyGrid(arr) {
   for (let x = 0; x < columns; x++) {
     for (let y = 0; y < rows; y++) {
       arr[x][y] = new GridCell(x, y, resolution);
-      let val = floor(random(2));
-      arr[x][y].setState(Boolean(val));
+    }
+  }
+}
+
+function fillRandomGrid(arr) {
+  for (let x = 0; x < columns; x++) {
+    for (let y = 0; y < rows; y++) {
+      arr[x][y] = new GridCell(x, y, resolution);
+      arr[x][y].setState(Boolean(floor(random(2))));
     }
   }
 }
@@ -26,10 +39,12 @@ function countNeighbors(x, y) {
   let sum = 0;
   for (let i = -1; i < 2; i++) {
     for (let j = -1; j < 2; j++) {
-      sum += grid[(x + i + columns) % columns][(y + j + rows) % rows].state;
+      sum += grid[(x + i + columns) % columns][
+        (y + j + rows) % rows
+      ].getState();
     }
   }
-  sum -= grid[x][y].state;
+  sum -= grid[x][y].getState();
   return sum;
 }
 
@@ -49,4 +64,10 @@ function updateGrid() {
     }
   }
   return arr;
+}
+
+function getGridCoordinates() {
+  let columnPressed = floor(mouseX / resolution);
+  let rowPressed = floor(mouseY / resolution);
+  return [columnPressed, rowPressed];
 }
