@@ -169,7 +169,7 @@ footer a {
   background-color: var(--background);
   border: 2px solid var(--background);
   color: var(--foreground);
-  height: 20rem;
+  height: 30rem;
   width: 100%;
 }
 
